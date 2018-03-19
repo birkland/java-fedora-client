@@ -20,10 +20,14 @@ import java.io.InputStream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 import org.dataconservancy.pass.client.PassJsonAdapter;
 import org.dataconservancy.pass.client.util.ConfigUtil;
 import org.dataconservancy.pass.model.PassEntity;
+
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +40,7 @@ public class PassJsonAdapterBasic implements PassJsonAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(PassJsonAdapterBasic.class);
     
     private final static String CONTEXT_PROPKEY = "pass.jsonld.context";
-    private final static String DEFAULT_CONTEXT = "http://oa-pass.github.io/pass-data-model/src/main/resources/context.jsonld";
+    private final static String DEFAULT_CONTEXT = "https://oa-pass.github.io/pass-data-model/src/main/resources/context.jsonld";
     
     /**
      * {@inheritDoc}
@@ -60,7 +64,13 @@ public class PassJsonAdapterBasic implements PassJsonAdapter {
         //convert to json
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            jsonld = objectMapper.writeValueAsBytes(passObj);
+            ObjectNode jsonObj = (ObjectNode) objectMapper.valueToTree(passObj);
+            
+            // This is because new objects (without an ID) should have the null relative URI
+            if (jsonObj.get("@id") == null) {
+                jsonObj.set("@id", new TextNode(""));
+            }
+            jsonld = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(jsonObj);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Could not model convert to JSON", e);
         }
@@ -84,8 +94,11 @@ public class PassJsonAdapterBasic implements PassJsonAdapter {
         PassEntity model = null;
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            model = (PassEntity) objectMapper.readValue(json, valueType);
+            ObjectNode parsed = (ObjectNode) objectMapper.readTree(json);
+            parsed.remove("@context");
+            model = (PassEntity) objectMapper.treeToValue(parsed, valueType);
             LOG.debug("JSON converted to model {}", valueType.getSimpleName());
+
         } catch (IOException e) {
             throw new RuntimeException("Could not map JSON to " + valueType.getSimpleName(), e);    
         } 
@@ -98,23 +111,11 @@ public class PassJsonAdapterBasic implements PassJsonAdapter {
      * @param <T>
      */
     public <T> PassEntity toModel(InputStream json, Class<T> valueType) {
-        if (json == null) {
-            throw new IllegalArgumentException("jsonLd cannot be empty");
-        }
-        if (valueType == null) {
-            throw new IllegalArgumentException("valueType cannot be empty");            
-        }
-        
-        //map to model
-        PassEntity model = null;
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            model = (PassEntity) objectMapper.readValue(json, valueType);
+            return toModel(IOUtils.toByteArray(json), valueType);
         } catch (IOException e) {
-            throw new RuntimeException("Could not map JSON to " + valueType.getSimpleName(), e);    
+            throw new RuntimeException("Could not map JSON to " + valueType.getSimpleName(), e);
         }
-
-        return model;
     }
     
     /**

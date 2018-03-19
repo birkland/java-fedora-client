@@ -36,7 +36,6 @@ import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
 import org.fcrepo.client.GetBuilder;
-import org.fcrepo.client.PostBuilder;
 import org.fcrepo.client.PutBuilder;
 
 /**
@@ -50,7 +49,7 @@ public class FedoraPassCrudClient {
 
     private final static String JSONLD_CONTENTTYPE = "application/ld+json; charset=utf-8";
     private final static String SERVER_MANAGED_OMITTYPE = "http://fedora.info/definitions/v4/repository#ServerManaged";
-    private final static String COMPACTED_ACCEPTTYPE = "application/ld+json; profile=\"http://www.w3.org/ns/json-ld#compacted\"";
+    private final static String COMPACTED_ACCEPTTYPE = "application/ld+json";
     
     /** 
      * The Fedora client tool 
@@ -63,7 +62,10 @@ public class FedoraPassCrudClient {
     private PassJsonAdapter adapter;
 
     public FedoraPassCrudClient() {
-        client = FcrepoClient.client().credentials(FedoraConfig.getUserName(), FedoraConfig.getPassword()).build();
+        client = FcrepoClient.client()
+                .credentials(FedoraConfig.getUserName(), FedoraConfig.getPassword())
+                .throwExceptionOnFailure()
+                .build();
         adapter = new PassJsonAdapterBasic();
     }
 
@@ -99,7 +101,7 @@ public class FedoraPassCrudClient {
         byte[] json = adapter.toJson(modelObj, true);
         InputStream jsonIS = new ByteArrayInputStream(json);
                 
-        try (FcrepoResponse response = new PostBuilder(container, client)
+        try (FcrepoResponse response = client.post(container)
                 .body(jsonIS, JSONLD_CONTENTTYPE)
                 .perform()) {
             newId = response.getLocation();
@@ -144,8 +146,7 @@ public class FedoraPassCrudClient {
     /**
      * @see org.dataconservancy.pass.client.PassClient#readResource(URI, Class)
      */
-    public <T> PassEntity readResource(URI uri, Class<T> modelClass) {
-        InputStream json = null;        
+    public <T> PassEntity readResource(URI uri, Class<T> modelClass) {      
 
         List<URI> omits = new ArrayList<URI>();
         try {
@@ -158,15 +159,14 @@ public class FedoraPassCrudClient {
                 .accept(COMPACTED_ACCEPTTYPE)
                 .preferRepresentation(null, omits)
                 .perform()) {
-          json = response.getBody();
+
           LOG.info("Resource read status: {}", response.getStatusCode());
+          
+          return (PassEntity) adapter.toModel(response.getBody(), modelClass);
+          
         } catch (IOException | FcrepoOperationFailedException e) {
             throw new RuntimeException("A problem occurred while attempting to read a Resource", e);
         }        
-        
-        PassEntity modelObj = (PassEntity) adapter.toModel(json, modelClass);
-                
-        return modelObj;
     }
 
     
