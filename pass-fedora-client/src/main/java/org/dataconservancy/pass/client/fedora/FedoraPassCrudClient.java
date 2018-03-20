@@ -36,7 +36,6 @@ import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
 import org.fcrepo.client.GetBuilder;
-import org.fcrepo.client.PutBuilder;
 
 /**
  * Fedora CRUD client does basic work of creating, retrieving, updating, and deleting
@@ -121,8 +120,9 @@ public class FedoraPassCrudClient {
         byte[] json = adapter.toJson(modelObj, true);
         InputStream jsonIS = new ByteArrayInputStream(json);
         
-        try (FcrepoResponse response = new PutBuilder(modelObj.getId(), client)
+        try (FcrepoResponse response = client.put(modelObj.getId())
                 .body(jsonIS, JSONLD_CONTENTTYPE)
+                .preferLenient()
                 .perform()) {
             updatedId = response.getLocation();
             LOG.info("Container update status and location: {}, {}", response.getStatusCode(), updatedId);
