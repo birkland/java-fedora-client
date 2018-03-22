@@ -60,7 +60,7 @@ public class RoundTripIT extends ClientITBase {
 
     /* Sparse roundtrip - empty objects */
     @Test
-    public void routdTripSparseTest() {
+    public void roundTripSparseTest() {
         PASS_TYPES.stream()
                 .map(ClientITBase::empty)
                 .forEach(this::roundTrip);
