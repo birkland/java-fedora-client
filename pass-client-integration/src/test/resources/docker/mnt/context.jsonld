@@ -57,6 +57,7 @@
     "orcidId": {"@id": "pass:orcidId"},
     "person": {"@id": "pass:person", "@type": "@id"},   
     "pi": {"@id": "pass:pi", "@type": "@id"},
+    "pmid": {"@id": "pass:pmid"},
     "pmcParticipation": {"@id": "pass:pmcParticipation"},
     "policy": {"@id": "pass:policy", "@type": "@id"},
     "primaryFunder": {"@id": "pass:primaryFunder", "@type": "@id"}, 
