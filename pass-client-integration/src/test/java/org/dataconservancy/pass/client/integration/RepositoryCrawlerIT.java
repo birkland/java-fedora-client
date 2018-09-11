@@ -60,6 +60,7 @@ public class RepositoryCrawlerIT extends ClientITBase {
         final PassClient client = PassClientFactory.getPassClient();
 
         final URI submission = client.createResource(new Submission());
+        createdUris.put(submission, Submission.class);
 
         try (CloseableHttpResponse response = http.execute(new HttpPost(submission))) {
             assertNotNull(response.getFirstHeader("Location"));
