@@ -36,6 +36,7 @@ import org.dataconservancy.pass.model.Submission;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 
 /**
@@ -62,6 +63,7 @@ public class RepositoryCrawlerIT extends ClientITBase {
 
         try (CloseableHttpResponse response = http.execute(new HttpPost(submission))) {
             assertNotNull(response.getFirstHeader("Location"));
+            EntityUtils.consume(response.getEntity());
         }
 
         final List<URI> found = new ArrayList<>();
