@@ -40,8 +40,18 @@ URI grantUri = client.findByAttribute(Grant.class, "awardNumber", awardNumber);
 The Java docs provide more information about this functionality.
 
 ### Crawling/iterating the repository.
+Simple walking of PASS entities is achieved by providing a `Consumer<URI>`, which is invoked for each matching PASS entity.  The API provides a mechanism for crawling all PassEntities (under an implicit base URI, `FedoraConfig.getBaseUrl()`):
 
-Use `org.dataconservancy.pass.client.fedora.RepositoryCrawler`.  It iterates resources in the repository, and invokes a provided `Consumer<URI>` for each resource URI encountered.  Additionally, resources can be ignored (not sent to the consumer, but their children still recursed), or skipped entirely (thus preventing recursion to their children).  `RepositoryCrawler.Ignore` and `RepositoryCrawler.Skip` classes have useful predicates for skipping or ignoring resources.
+    PassClient client = PassClientFactory.getPassClient();
+    
+    // Process all PASS entities
+    client.client.processAllEntities(myConsumer);
+    
+    // Process only submissions
+    client.client.processAllEntities(myConsumer, Submission.class);
+
+
+For finer grained control, use `org.dataconservancy.pass.client.fedora.RepositoryCrawler`.  Resources can be ignored (not sent to the consumer, but their children still recursed), or skipped entirely (thus preventing recursion to their children).  `RepositoryCrawler.Ignore` and `RepositoryCrawler.Skip` classes have useful predicates for skipping or ignoring resources.
 
 For example, to iterate ONLY submission resources (and not binary files that might be children of them), use recursion depth of 1, and ignore the parent `submissions/` container, as it is not a `Submission`:
 
