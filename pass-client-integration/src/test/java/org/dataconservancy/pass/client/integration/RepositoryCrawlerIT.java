@@ -26,11 +26,13 @@ import static org.junit.Assert.assertTrue;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.dataconservancy.pass.client.PassClient;
 import org.dataconservancy.pass.client.PassClientFactory;
 import org.dataconservancy.pass.client.fedora.FedoraConfig;
 import org.dataconservancy.pass.client.fedora.RepositoryCrawler;
+import org.dataconservancy.pass.model.PassEntity;
 import org.dataconservancy.pass.model.Submission;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -72,6 +74,63 @@ public class RepositoryCrawlerIT extends ClientITBase {
                 depth(2).or(SKIP_ACLS));
         assertEquals(1, afterCount - initialCount);
         assertTrue(found.contains(submission));
+    }
+
+    // Verifies that the high-level client API for processing all resources works.
+    @Test
+    public void processAllTest() {
+        final PassClient client = PassClientFactory.getPassClient();
+
+        // Account for resources that may already be in the repo
+        final List<URI> preExisting = new ArrayList<>();
+        client.processAllEntities(preExisting::add);
+
+        final List<URI> created = PASS_TYPES.stream()
+                .map(cls -> random(cls, 2))
+                .map(e -> add(e, client))
+                .collect(Collectors.toList());
+
+        final List<URI> visited = new ArrayList<>();
+        assertEquals(created.size(), client.processAllEntities(visited::add) - preExisting.size());
+
+        assertEquals(created.size(), visited.size() - preExisting.size());
+        assertTrue(visited.containsAll(created));
+    }
+
+    // Verifies that the high-level client API for processing resources of a specific type works.
+    @Test
+    public void processspecificTypeTest() {
+        final PassClient client = PassClientFactory.getPassClient();
+
+        // Account for resources that may already be in the repo
+        final List<URI> preExisting = new ArrayList<>();
+        client.processAllEntities(preExisting::add, Submission.class);
+
+        PASS_TYPES.stream()
+                .map(cls -> random(cls, 2))
+                .map(e -> add(e, client))
+                .collect(Collectors.toList());
+
+        final List<URI> visited = new ArrayList<>();
+        assertEquals(1, client.processAllEntities(visited::add, Submission.class) - preExisting.size());
+
+        assertEquals(1, visited.size() - preExisting.size());
+    }
+
+    private <T extends PassEntity> URI add(T entity, PassClient client) {
+        final URI added = client.createResource(entity);
+        createdUris.put(added, entity.getClass());
+
+        // Add a child to submissions. These should never be found by processAll.
+        if (entity instanceof Submission) {
+            try (CloseableHttpResponse response = http.execute(new HttpPost(added))) {
+                assertNotNull(response.getFirstHeader("Location"));
+                EntityUtils.consume(response.getEntity());
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return added;
     }
 
 }
