@@ -18,7 +18,7 @@
     <module>pass-client-util</module>
     <module>pass-client-integration</module>
     <module>pass-test-data</module>
-    <module>pass-client-shaded</module>
+    <module>pass-client-shaded-v2_3</module>
   </modules>
 
   <profiles>

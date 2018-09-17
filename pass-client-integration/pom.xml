@@ -210,9 +210,8 @@
     
     <dependency>
       <groupId>org.dataconservancy.pass</groupId>
-      <artifactId>pass-client-shaded</artifactId>
+      <artifactId>pass-client-shaded-v2_3</artifactId>
       <version>${project.version}</version>
-      <classifier>v2_3</classifier>
       <scope>test</scope>
     </dependency>
 
