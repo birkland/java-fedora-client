@@ -65,7 +65,7 @@ public class SubmissionStatusCalculator  {
      * </p>
      * @param repositories Submission repositories
      * @param deposits Submission deposits
-     * @param repositoryCopies Rubmission repository copies
+     * @param repositoryCopies Submission repository copies
      * @return Calculated submission status
      */
     public static SubmissionStatus calculatePostSubmissionStatus(List<URI> repositories,
@@ -84,8 +84,7 @@ public class SubmissionStatusCalculator  {
     /**
      * Calculates the appropriate pre-Submission status based on data provided. 
      * <p>
-     * Pre-Submission 
-     * calculations use the {@code SubmissionEvents} associated with the {@link Submission} 
+     * Pre-Submission calculations use the {@code SubmissionEvents} associated with the {@link Submission} 
      * to determine the status of a Submission before it has been submitted ({@code Submission.status=false}.
      * </p>
      * @param submissionEvents List of submission events

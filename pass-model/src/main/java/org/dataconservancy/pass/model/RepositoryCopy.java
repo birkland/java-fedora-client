@@ -158,7 +158,7 @@ public class RepositoryCopy extends PassEntity {
 
     
     /**
-     * @param copyStatus status the repository's status to set
+     * @param copyStatus The repository's status to set
      */
     public void setCopyStatus(CopyStatus copyStatus) {
         this.copyStatus = copyStatus;

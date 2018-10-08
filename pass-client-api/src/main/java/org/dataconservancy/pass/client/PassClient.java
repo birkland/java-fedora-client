@@ -85,7 +85,7 @@ public interface PassClient {
     
     /**
      * Retrieves the entity matching the URI provided, populates the appropriate Java class with its values.
-     * @param uri The URI if the resource to be read.
+     * @param uri The URI of the resource to be read.
      * @param modelClass The class of PASS entity.
      * @return The pass entity.
      * @param <T> PASS entity type
@@ -97,8 +97,7 @@ public interface PassClient {
      * specified using the value provided. For example, to find the {@link Grant} using the {@code awardNumber}:
      * 
      * <p>
-     * For example, to find the Grant using the 
-     * awardNumber:
+     * For example, to find the Grant using the {@code awardNumber}:
      * </p>
      * <pre>{@code
      *    String awardNum = "abcdef123";
@@ -123,10 +122,10 @@ public interface PassClient {
     
     /**
      * Retrieves URIs for MULTIPLE MATCHING RECORDS by matching the entity type and filtering by the field
-     * specified using the value provided. For example, to find {@link Deposit}s using a {@code Repository.id}:
+     * specified using the value provided.
      * <p>
      * 
-     * For example, to find {@link Deposit}s using a Repository.id:
+     * For example, to find {@link Deposit}s using a {@code Repository.id}:
      * </p>
      * <pre>{@code
      *    URI repositoryId = new URI("https://example.com/fedora/repositories/3");
@@ -186,8 +185,7 @@ public interface PassClient {
      * Retrieves URIs for MULTIPLE MATCHING RECORDS by matching the entity type and filtering by the attributes
      * and values specified. An "AND" operator will be used for searching multiple attributes.
      * 
-     * <p>
-     * An "AND" operator will be used for searching multiple attributes. 
+     * <p> 
      * For example, to find a Submission using a GrantId AND DOI:
      * </p>
      * <pre>
@@ -218,7 +216,7 @@ public interface PassClient {
     
     /**
      * Retrieves URIs for MULTIPLE MATCHING RECORDS by matching the entity type and filtering by the attributes
-     * and values specified. For example, to find a Submission using a GrantId and DOI:
+     * and values specified.
      * 
      * <p>
      *  For example, to find a Submission using a GrantId and DOI:
