@@ -83,7 +83,7 @@ public interface PassClient {
     /**
      * Retrieves the entity matching the URI provided, populates the  
      * appropriate Java class with its values.
-     * @param uri The URI if the resource to be read.
+     * @param uri The URI of the resource to be read.
      * @param modelClass The class of PASS entity.
      * @return The pass entity.
      * @param <T> PASS entity type
@@ -91,10 +91,10 @@ public interface PassClient {
     public <T extends PassEntity> T readResource(URI uri, Class<T> modelClass);
     
     /**
-     * Retrieves URI for a SINGLE RECORD by matching the entity type and filtering
+     * Retrieves URI for a SINGLE RECORD by matching the entity type and filtering by the field
+     * specified using the value provided.
      * <p>
-     * For example, to find the Grant using the 
-     * awardNumber:
+     * For example, to find the Grant using the {@code awardNumber}:
      * </p>
      * <pre>{@code
      *    String awardNum = "abcdef123";
@@ -118,10 +118,11 @@ public interface PassClient {
     
     
     /**
-     * Retrieves URIs for MULTIPLE MATCHING RECORDS by matching the entity type and filtering.
+     * Retrieves URIs for MULTIPLE MATCHING RECORDS by matching the entity type and filtering by the field
+     * specified using the value provided.
      * 
      * <p>
-     * For example, to find Deposits using a Repository.id:
+     * For example, to find Deposits using a {@code Repository.id}:
      * </p>
      * <pre>{@code
      *    URI repositoryId = new URI("https://example.com/fedora/repositories/3");
@@ -176,9 +177,9 @@ public interface PassClient {
     
     
     /**
-     * Retrieves URIs for MULTIPLE MATCHING RECORDS by matching the entity type and filtering.
+     * Retrieves URIs for MULTIPLE MATCHING RECORDS by matching the entity type and filtering by the attributes
+     * and values specified.  An "AND" operator will be used for searching multiple attributes
      * <p>
-     * An "AND" operator will be used for searching multiple attributes. 
      * For example, to find a Submission using a GrantId AND DOI:
      * </p>
      * <pre>{@code
